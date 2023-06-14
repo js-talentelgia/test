@@ -1,32 +1,65 @@
-pipeline{
+pipeline {
     agent any
-    stages{
-        stage("A"){
-            steps{
-                echo "========executing A========"
+    environment {
+        name = 'Jagseer' 
+    }
+    parameters {
+        string(name:'person',defaultValue: 'Jagseer Singh', description: "")
+        booleanParam(name: 'isMale',defaultValue: false, description: "")
+        choice(name: 'city',choices:['Jaipur','Haryana','Punjab'], description: "")
+    }
+    stages {
+        stage('Test') {
+            steps {
+                sh '''
+                ls 
+                date
+                pwd
+                cal 2023
+                '''
             }
-            post{
-                always{
-                    echo "========always========"
-                }
-                success{
-                    echo "========A executed successfully========"
-                }
-                failure{
-                    echo "========A execution failed========"
-                }
+        }
+        stage('build') {
+            environment {
+                name = 'Singh' 
+            }
+            steps {
+                sh 'echo build'
+                sh 'echo build ${BUILD_ID}'
+                sh 'echo Hello "${name}"'
+            }
+        }
+        stage('parametes') {
+            steps {
+                sh 'echo Hello "${person}"'
+                sh 'echo isMale "${isMale}"'
+                sh 'echo city "${city}"'
+            }
+        }
+        stage('Continue ?') {
+            input {
+                message "Should we continue"
+                ok "Yes we can continue"
+            }
+            steps {
+                sh "echo deploy on production"
+            }
+        }
+        stage('prod') {
+            steps {
+                echo 'deploy on production'
             }
         }
     }
     post{
-        always{
-            echo "========always========"
+            always {
+                echo "I always run with buid"
+            }
+            failure {
+                echo "fail build"
+            }
+            success {
+                echo "success"
+            }
         }
-        success{
-            echo "========pipeline executed successfully ========"
-        }
-        failure{
-            echo "========pipeline execution failed========"
-        }
-    }
 }
